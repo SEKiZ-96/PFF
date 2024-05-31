@@ -9,7 +9,7 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Support\Facades\Route;
 
 
-trait EmailOperation
+trait TprintOperation
 {
     /**
      * Define which routes are needed for this operation.
@@ -18,7 +18,7 @@ trait EmailOperation
      * @param string $routeName  Prefix of the route name.
      * @param string $controller Name of the current CrudController.
      */
-    protected function setupEmailRoutes($segment, $routeName, $controller)
+    protected function setupTprintRoutes($segment, $routeName, $controller)
     {
         Route::get($segment.'/{group}/schedule', [
             'as'        => $routeName.'.schedule',
@@ -30,7 +30,7 @@ trait EmailOperation
     /**
      * Add the default settings, buttons, etc that this operation needs.
      */
-    protected function setupEmailDefaults()
+    protected function setupTprintDefaults()
     {
         CRUD::allowAccess('schedule');
 
@@ -70,7 +70,7 @@ trait EmailOperation
         $schedules = TimeSchedule::where('teacher', $teacher)->get();
 
         // Initialize group name variable
-        $tchname = '';
+        $tchname = Teacher::where('id', $teacher)->value('teacher_name');
 
         foreach ($schedules as $schedule) {
             $schedule->teacher_name = Teacher::where('id', $schedule->teacher)->value('teacher_name');
@@ -79,7 +79,7 @@ trait EmailOperation
 
             // Set group name for the first schedule
             if (empty($tchname)) {
-                $tchname = $schedule->teacher_name;
+                // $tchname = $schedule->teacher_name;
             }
         }
 

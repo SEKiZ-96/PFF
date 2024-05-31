@@ -70,7 +70,7 @@ trait EmailOperation
         $schedules = TimeSchedule::where('group', $group)->get();
 
         // Initialize group name variable
-        $grpname = '';
+        $grpname = Group::where('id', $group)->value('group_name');
 
         foreach ($schedules as $schedule) {
             $schedule->teacher_name = Teacher::where('id', $schedule->teacher)->value('teacher_name');
@@ -79,7 +79,7 @@ trait EmailOperation
 
             // Set group name for the first schedule
             if (empty($grpname)) {
-                $grpname = $schedule->group_name;
+                // $grpname = $schedule->group_name;
             }
         }
 

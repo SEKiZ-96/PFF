@@ -1,3 +1,6 @@
+
+
+
 @section('header')
 <div class="container-fluid d-flex justify-content-between my-3">
     <section class="header-operation animated fadeIn d-flex mb-2 align-items-baseline d-print-none" bp-section="page-header">
@@ -7,66 +10,71 @@
             <small><a href="{{ url($crud->route) }}" class="font-sm"><i class="la la-angle-double-left"></i> {{ trans('backpack::crud.back_to_all') }} <span>{{ $crud->entity_name_plural }}</span></a></small>
         </p>
         @endif
-        <a style="margin-left:10px;" href="javascript: window.print();" class="btn btn-outline-secondary float-end"><i class="la la-print"></i></a>
+        <br>
+        <p>
+
+            </p>
+        <a style="margin-left:10px;" href="javascript: window.print();" class="btn float-end float-right"><i class="la la-print"></i></a>
+        
     </section>
 </div>
 @endsection
 
 @section('content')
 <?php
-$days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                $totalHours = 0;
+                function getPeriodLabel($periodCode) {
+                    switch ($periodCode) {
+                        case 'M':
+                            return '08:30 - 13:30';
+                        case 'M1':
+                            return '08:30 - 11:00';
+                        case 'M2':
+                            return '11:00 - 13:30';
+                        case 'A':
+                            return '13:30 - 18:30';
+                        case 'A1':
+                            return '13:30 - 16:00';
+                        case 'A2':
+                            return '16:00 - 18:30';
+                        default:
+                            return null; 
+                    }
+                }
 
-function getPeriodLabel($periodCode) {
-    switch ($periodCode) {
-        case 'M':
-            return '08:30 - 13:30';
-        case 'M1':
-            return '08:30 - 11:00';
-        case 'M2':
-            return '11:00 - 13:30';
-        case 'A':
-            return '13:30 - 18:30';
-        case 'A1':
-            return '13:30 - 16:00';
-        case 'A2':
-            return '16:00 - 18:30';
-        default:
-            return null; 
-    }
-}
+                function getPeriodStartTime($periodCode) {
+                    switch ($periodCode) {
+                        case 'M':
+                            return '08:30';
+                        case 'M1':
+                            return '08:30';
+                        case 'M2':
+                            return '11:00';
+                        case 'A':
+                            return '13:30';
+                        case 'A1':
+                            return '13:30';
+                        case 'A2':
+                            return '16:00';
+                        default:
+                            return '00:00'; // Default to earliest time for safety
+                    }
+                }
 
-function getPeriodStartTime($periodCode) {
-    switch ($periodCode) {
-        case 'M':
-            return '08:30';
-        case 'M1':
-            return '08:30';
-        case 'M2':
-            return '11:00';
-        case 'A':
-            return '13:30';
-        case 'A1':
-            return '13:30';
-        case 'A2':
-            return '16:00';
-        default:
-            return '00:00'; // Default to earliest time for safety
-    }
-}
+                // Group schedules by day
+                $groupedSchedules = [];
+                foreach ($schedules as $schedule) {
+                    $groupedSchedules[$schedule->day][] = $schedule;
+                }
 
-// Group schedules by day
-$groupedSchedules = [];
-foreach ($schedules as $schedule) {
-    $groupedSchedules[$schedule->day][] = $schedule;
-}
-
-// Sort schedules within each day by period start time
-foreach ($groupedSchedules as $day => &$daySchedules) {
-    usort($daySchedules, function($a, $b) {
-        return strcmp(getPeriodStartTime($a->period), getPeriodStartTime($b->period));
-    });
-}
-?>
+                // Sort schedules within each day by period start time
+                foreach ($groupedSchedules as $day => &$daySchedules) {
+                    usort($daySchedules, function($a, $b) {
+                        return strcmp(getPeriodStartTime($a->period), getPeriodStartTime($b->period));
+                    });
+                }
+            ?>
 <div class="container-fluid printable-content">
 <?php
 $totalHours = 0;
@@ -95,12 +103,9 @@ $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday
         ?>
     @endif
 @endforeach
-
-<div class="mb-3">
-    <span>GROUP: <b>{{$grpname}}</b></span>
-    <span class="float-end">Total Hours: <b>{{ $totalHours }}</b></span>
-</div>
-
+<span>Teacher: <b>{{$tchname}}</b></span>
+<span class="float-end">Total Hours: <b>{{$totalHours}}</b></span>
+<br>
 <table class="table table-striped table-hover table-bordered shadow-sm">
     <thead class="table-dark">
         <tr>
@@ -120,7 +125,7 @@ $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday
                             @foreach($groupedSchedules[$day] as $schedule)
                                 @if($schedule->period == $period || ($schedule->period == 'M' && ($period == 'M1' || $period == 'M2')) || ($schedule->period == 'A' && ($period == 'A1' || $period == 'A2')))
                                     <div class="text-center">
-                                        <strong>{{ $schedule->teacher_name }}</strong><br>
+                                        <strong>{{ $schedule->group_name }}</strong><br>
                                         <small>{{ $schedule->room_name }}</small>
                                     </div>
                                 @endif
