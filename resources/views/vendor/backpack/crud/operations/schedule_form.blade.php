@@ -39,7 +39,7 @@
                         case 'A2':
                             return '16:00 - 18:30';
                         default:
-                            return null; // Handle this case as per your requirement
+                            return null; 
                     }
                 }
 
@@ -77,62 +77,68 @@
             ?>
 <div class="container-fluid printable-content">
 <?php
-    $totalHours = 0;
-    ?>
-    @foreach($days as $day)
-        @if(isset($groupedSchedules[$day]))
+$totalHours = 0;
+$daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+?>
+@foreach($daysOfWeek as $day)
+    @if(isset($groupedSchedules[$day]))
+        <?php
+        $dayTotalHours = 0;
+        ?>
+        @foreach($groupedSchedules[$day] as $schedule)
             <?php
-            $dayTotalHours = 0;
+            // Extract start and end time from period label
+            $periodLabelParts = explode(" - ", getPeriodLabel($schedule->period));
+            $startTime = strtotime($periodLabelParts[0]);
+            $endTime = strtotime($periodLabelParts[1]);
+            // Calculate duration in hours
+            $duration = ($endTime - $startTime) / 3600;
+            // Accumulate total hours for the day
+            $dayTotalHours += $duration;
             ?>
-            @foreach($groupedSchedules[$day] as $schedule)
-                <?php
-                // Extract start and end time from period label
-                $periodLabelParts = explode(" - ", getPeriodLabel($schedule->period));
-                $startTime = strtotime($periodLabelParts[0]);
-                $endTime = strtotime($periodLabelParts[1]);
-                // Calculate duration in hours
-                $duration = ($endTime - $startTime) / 3600;
-                // Accumulate total hours for the day
-                $dayTotalHours += $duration;
-                ?>
-            @endforeach
-            <?php
-            // Accumulate total hours for all days
-            $totalHours += $dayTotalHours;
-            ?>
-        @endif
-    @endforeach
-    
-    <span>GROUP: <b>{{$grpname}}</b></span> -
-    <span class="flot-right">Total Hours: <b>{{ $totalHours }}</b></span>
-    <br>
-    <table class="table table-striped table-hover nowrap rounded card-table table-vcenter card d-table shadow-xs border-xs dataTable dtr-inline collapsed has-hidden-columns">
-        <thead>
+        @endforeach
+        <?php
+        // Accumulate total hours for all days
+        $totalHours += $dayTotalHours;
+        ?>
+    @endif
+@endforeach
+
+<span>GROUP: <b>{{$grpname}}</b></span> -
+<span class="flot-right">Total Hours: <b>{{ $totalHours }}</b></span>
+<br>
+<table class="table table-striped table-hover nowrap rounded card-table table-vcenter card d-table shadow-xs border-xs dataTable dtr-inline collapsed has-hidden-columns">
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Teachers and periods</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($daysOfWeek as $day)
             <tr>
-                <th>Day</th>
-                <th>Teachers and periods</th>
+                <td>{{ $day }}</td>
+                <td>
+                    @if(isset($groupedSchedules[$day]))
+                        <table class="table table-bordered">
+                            @foreach($groupedSchedules[$day] as $schedule)
+                                <tr>
+                                    <td><b>{{ getPeriodLabel($schedule->period) }}</b></td>
+                                    <td style="text-align:center;"><b>{{$schedule->teacher_name }}</b><br><b>{{$schedule->room_name}}</b></td>
+                                </tr>
+                            @endforeach
+                        </table>
+                    @else
+                        <table class="table table-bordered">
+                            <tr>
+                                <td style="text-align:center;"><b>No Schedule</b></td>
+                            </tr>
+                        </table>
+                    @endif
+                </td>
             </tr>
-        </thead>
-        <tbody>
-        
-            @foreach($days as $day)
-                @if(isset($groupedSchedules[$day]))
-                    <tr>
-                        <td>{{ $day }}</td>
-                        <td>
-                            <table class="table table-bordered">
-                                @foreach($groupedSchedules[$day] as $schedule)
-                                    <tr>
-                                        <td><b>{{ getPeriodLabel($schedule->period) }}</b></td>
-                                        <td><b>{{$schedule->teacher_name }}</b><br><b>{{$schedule->room_name}}</b></td>
-                                    </tr>
-                                @endforeach
-                            </table>
-                        </td>
-                    </tr>
-                @endif
-            @endforeach
-        </tbody>
-    </table>
+        @endforeach
+    </tbody>
+</table>
 </div>
 @endsection

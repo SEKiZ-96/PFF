@@ -22,7 +22,7 @@ class TimeScheduleCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     // use \Backpack\CRUD\app\Http\Controllers\Operations\PrintOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    // use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
     // use \App\Models\Teacher;
 
     /**
@@ -30,12 +30,18 @@ class TimeScheduleCrudController extends CrudController
      * 
      * @return void
      */
+    // public function setup()
+    // {
+    //     CRUD::setModel(TimeSchedule::class);
+    //     CRUD::setRoute(config('backpack.base.route_prefix') . '/time-schedule');
+    //     CRUD::setEntityNameStrings('time schedule', 'time schedules');
+        
+    // }
     public function setup()
     {
         CRUD::setModel(TimeSchedule::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/time-schedule');
         CRUD::setEntityNameStrings('time schedule', 'time schedules');
-        
     }
 
     /**
@@ -108,23 +114,7 @@ class TimeScheduleCrudController extends CrudController
 
         
     }
-    public function show($id)
-    {
-        // Fetch the schedule entry by ID
-        $schedule = TimeSchedule::findOrFail($id);
-
-        // Get the group value
-        $group = $schedule->group;
-
-        // Fetch all schedules with the same group value
-        $schedules = TimeSchedule::where('group', $group)->get();
-
-        // Pass the data to the view using compact() or an associative array
-        return view('crud::operations.schedule_form', $schedules);
-    }
-
-
-
+    
     /**
      * Define what happens when the Create operation is loaded.
      * 
