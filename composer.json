@@ -12,7 +12,6 @@
         "laravel/tinker": "^2.9"
     },
     "require-dev": {
-        "backpack/devtools": "*",
         "backpack/generators": "*",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
